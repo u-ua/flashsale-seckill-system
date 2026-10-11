@@ -1,0 +1,27 @@
+spring:
+  application.name: seckill-system
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/seckill?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
+  jpa:
+    hibernate.ddl-auto: validate
+    open-in-view: false
+  data.redis.host: ${REDIS_HOST:localhost}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: seckill-order-consumer
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.mengyao.seckill.order
+server:
+  port: 8080
+seckill:
+  kafka-topic: seckill.orders
+  rate-limit:
+    user: 20
+    ip: 60
+    global: 1000

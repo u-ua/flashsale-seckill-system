@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="高并发秒杀系统演示台">
+  <title>FlashSale · 秒杀演示台</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="FlashSale 首页"><span class="brand-mark">F</span><span>FlashSale</span></a>
+      <span class="environment"><i></i> LOCAL DEMO</span>
+    </header>
+
+    <section class="hero">
+      <div>
+        <p class="eyebrow">HIGH CONCURRENCY SECKILL</p>
+        <h1>100 元限量秒杀券</h1>
+        <p class="subtitle">Redis 原子决策，Kafka 异步下单。每一次请求都经过真实的库存与重复下单校验。</p>
+      </div>
+      <div class="hero-status"><span>系统状态</span><strong id="serviceStatus">等待连接</strong><small>Spring Boot · Redis · Kafka · MySQL</small></div>
+    </section>
+
+    <section class="grid">
+      <article class="card product-card">
+        <div class="card-head"><span class="label">SECKILL VOUCHER #1</span><span class="live-dot">LIVE</span></div>
+        <div class="ticket"><div class="ticket-value">¥<b>100</b></div><div class="ticket-copy"><b>限量秒杀券</b><span>仅用于本地项目演示</span></div></div>
+        <div class="stock-row"><span>剩余可抢库存</span><strong id="stockValue">--</strong><small>件</small></div>
+        <button id="refreshButton" class="text-button" type="button">↻ 刷新商品详情</button>
+      </article>
+
+      <article class="card action-card">
+        <div class="card-head"><span class="label">PLACE ORDER</span><span class="step">01</span></div>
+        <h2>立即参与秒杀</h2>
+        <label for="userId">模拟用户 ID</label>
+        <input id="userId" inputmode="numeric" value="10001" min="1" type="number" placeholder="例如 10001">
+        <button id="orderButton" class="primary-button" type="button">抢购 ¥100 秒杀券 <span>→</span></button>
+        <p class="hint">同一用户仅可成功下单一次；接口接受成功后将异步写入订单。</p>
+      </article>
+
+      <article class="card result-card">
+        <div class="card-head"><span class="label">ORDER TIMELINE</span><span class="step">02</span></div>
+        <div id="emptyState" class="empty-state"><div class="empty-icon">⌁</div><b>等待一次秒杀请求</b><span>提交后会在这里显示真实订单状态</span></div>
+        <div id="resultState" class="result-state hidden">
+          <span id="resultTag" class="result-tag">PROCESSING</span>
+          <h2 id="resultTitle">订单正在进入队列</h2>
+          <p id="resultMessage">Kafka 消费者正在处理订单。</p>
+          <code id="orderId">ORDER --</code>
+          <div class="timeline"><span class="done">Redis Lua 校验</span><span class="done">Kafka 投递</span><span id="persistStep">MySQL 落库</span></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="architecture">
+      <div class="section-heading"><p class="eyebrow">REQUEST PATH</p><h2>一次抢购，经过四道防线</h2></div>
+      <div class="flow">
+        <div><b>01</b><strong>滑动窗口限流</strong><span>用户 / IP / 全局</span></div><i>→</i>
+        <div><b>02</b><strong>Redis Lua</strong><span>库存 + 一人一单</span></div><i>→</i>
+        <div><b>03</b><strong>Kafka</strong><span>削峰异步投递</span></div><i>→</i>
+        <div><b>04</b><strong>MySQL</strong><span>唯一索引幂等</span></div>
+      </div>
+    </section>
+
+    <section class="controls">
+      <div><p class="eyebrow">DEMO CONTROL</p><h2>重置本地库存</h2><p>仅用于本地演示。会初始化 Redis 库存，并清除当前券的 Redis 用户下单标记。</p></div>
+      <div class="seed-form"><input id="seedStock" type="number" min="0" value="100" aria-label="初始化库存数量"><button id="seedButton" type="button">初始化库存</button></div>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
