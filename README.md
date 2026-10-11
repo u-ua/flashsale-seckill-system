@@ -1,20 +1,10 @@
 # FlashSale｜高并发电商秒杀系统
 
-> Java 后端作品集项目 · Redis 原子决策 · Kafka 异步下单 · MySQL 最终幂等
+> 个人学习项目 · Redis 原子决策 · Kafka 异步下单 · MySQL 最终幂等
 
 一个用于展示秒杀核心链路的 Spring Boot 项目。它把“是否能抢到”放在 Redis 原子脚本中快速决定，把订单持久化放入 Kafka 异步执行，并用 MySQL 唯一索引保证最终幂等。
 
 > 这是学习/作品集项目，**没有伪造压测吞吐、P95 或订单 TPS 数据**。运行 `docs/benchmark.md` 的方案后，再将实测报告作为仓库证据提交。
-
-## 招聘方速览
-
-| 关注点 | 本项目的实现 |
-| --- | --- |
-| 如何防超卖？ | Redis Lua 将库存检查、扣减及一人一单标记合并为单次原子执行；MySQL 唯一索引提供最终兜底。 |
-| 流量高峰如何保护数据库？ | 接口在 Redis 决策成功后写入 Kafka，订单由消费者异步落库。 |
-| 热点读与恶意请求如何处理？ | Caffeine + Redis 二级缓存保护热点数据；Redis ZSet + Lua 实现用户、IP、全局三维滑动窗口限流。 |
-
-仓库中的实现与可用于简历的表述见 [docs/resume-project.md](docs/resume-project.md)。
 
 ## 技术栈
 
